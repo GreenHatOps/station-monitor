@@ -196,4 +196,4 @@ golangci-lint run
 
 ## License
 
-MIT
+[MIT](LICENSE)
