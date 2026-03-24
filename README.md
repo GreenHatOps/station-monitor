@@ -123,6 +123,19 @@ kubectl label configmap station-monitor-dashboard grafana_dashboard=1 -n monitor
 
 The dashboard includes: system overview, thermal monitoring, NVMe/SMART health gauges, GPU status, CPU/memory usage, network traffic, disk I/O, filesystem usage, and load averages.
 
+## Customization
+
+Before deploying the scrape configs and alerting rules, update the placeholder values in `deploy/scrapeconfig.yaml`:
+
+| Placeholder | Replace with | Example |
+|-------------|-------------|---------|
+| `<STATION_IP>` | IP address of your workstation | `192.168.1.50` |
+| `<HOSTNAME>` | A label to identify your station in Prometheus/Grafana | `my-workstation` |
+
+```bash
+sed -i 's/<STATION_IP>/192.168.1.50/g; s/<HOSTNAME>/my-workstation/g' deploy/scrapeconfig.yaml
+```
+
 ## Prometheus Scrape Config
 
 ### Kubernetes (kube-prometheus-stack)
