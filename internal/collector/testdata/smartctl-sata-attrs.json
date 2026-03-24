@@ -1,0 +1,17 @@
+{
+  "json_format_version": [1, 0],
+  "smartctl": { "exit_status": 0 },
+  "model_name": "WDC WD10EZEX-00W",
+  "temperature": { "current": 35 },
+  "power_on_time": { "hours": 8760 },
+  "power_cycle_count": 200,
+  "ata_smart_attributes": {
+    "table": [
+      { "id": 5, "name": "Reallocated_Sector_Ct", "raw": { "value": 2 } },
+      { "id": 9, "name": "Power_On_Hours", "raw": { "value": 8760 } },
+      { "id": 12, "name": "Power_Cycle_Count", "raw": { "value": 200 } },
+      { "id": 194, "name": "Temperature_Celsius", "raw": { "value": 35 } },
+      { "id": 197, "name": "Current_Pending_Sector", "raw": { "value": 1 } }
+    ]
+  }
+}

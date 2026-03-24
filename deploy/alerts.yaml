@@ -1,0 +1,64 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: station-monitor-alerts
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: station-monitor.rules
+      rules:
+        - alert: SmartDriveWearHigh
+          expr: station_smart_percentage_used_ratio > 0.8
+          for: 1h
+          labels:
+            severity: warning
+          annotations:
+            summary: "Drive {{ $labels.device }} wear is {{ $value | humanizePercentage }}"
+            description: "NVMe drive {{ $labels.device }} ({{ $labels.model }}) has used {{ $value | humanizePercentage }} of its rated life."
+
+        - alert: SmartDriveSpareLow
+          expr: station_smart_available_spare_ratio < 0.1
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Drive {{ $labels.device }} available spare is critically low"
+            description: "NVMe drive {{ $labels.device }} ({{ $labels.model }}) has only {{ $value | humanizePercentage }} spare capacity remaining."
+
+        - alert: SmartMediaErrors
+          expr: station_smart_media_errors_total > 0
+          for: 0m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Drive {{ $labels.device }} has media errors"
+            description: "NVMe drive {{ $labels.device }} ({{ $labels.model }}) has {{ $value }} media/integrity errors."
+
+        - alert: SmartCriticalWarning
+          expr: station_smart_critical_warning > 0
+          for: 0m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Drive {{ $labels.device }} critical warning active"
+            description: "NVMe drive {{ $labels.device }} ({{ $labels.model }}) has critical warning bitmask {{ $value }}."
+
+        - alert: SmartDriveTemperatureHigh
+          expr: station_smart_temperature_celsius > 70
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Drive {{ $labels.device }} temperature is {{ $value }}°C"
+            description: "Drive {{ $labels.device }} ({{ $labels.model }}) temperature exceeds 70°C threshold."
+
+        - alert: SmartReallocatedSectors
+          expr: station_smart_reallocated_sectors_total > 0
+          for: 0m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Drive {{ $labels.device }} has reallocated sectors"
+            description: "SATA drive {{ $labels.device }} ({{ $labels.model }}) has {{ $value }} reallocated sectors."

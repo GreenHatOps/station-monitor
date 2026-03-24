@@ -1,0 +1,752 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 100,
+      "title": "System Overview",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "steps": [{ "color": "green", "value": null }] },
+          "unit": "s"
+        }
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 1 },
+      "id": 1,
+      "options": { "colorMode": "value", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "title": "Uptime",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "time() - node_boot_time_seconds{instance=\"$instance\", job=~\"station-node-exporter\"}",
+          "legendFormat": ""
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "steps": [
+            { "color": "green", "value": null },
+            { "color": "yellow", "value": 70 },
+            { "color": "red", "value": 90 }
+          ]},
+          "unit": "percent", "min": 0, "max": 100
+        }
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 1 },
+      "id": 2,
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "title": "CPU Usage",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "(1 - avg(rate(node_cpu_seconds_total{instance=\"$instance\", job=~\"station-node-exporter\", mode=\"idle\"}[5m]))) * 100",
+          "legendFormat": ""
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "steps": [
+            { "color": "green", "value": null },
+            { "color": "yellow", "value": 70 },
+            { "color": "red", "value": 90 }
+          ]},
+          "unit": "percent", "min": 0, "max": 100
+        }
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 1 },
+      "id": 3,
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "title": "Memory Usage",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "(1 - (node_memory_MemAvailable_bytes{instance=\"$instance\", job=~\"station-node-exporter\"} / node_memory_MemTotal_bytes{instance=\"$instance\", job=~\"station-node-exporter\"})) * 100",
+          "legendFormat": ""
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "steps": [
+            { "color": "green", "value": null },
+            { "color": "yellow", "value": 70 },
+            { "color": "red", "value": 90 }
+          ]},
+          "unit": "percent", "min": 0, "max": 100
+        }
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 1 },
+      "id": 4,
+      "options": { "colorMode": "value", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "title": "Disk Usage /",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "(1 - (node_filesystem_avail_bytes{instance=\"$instance\", job=~\"station-node-exporter\", mountpoint=\"/\"} / node_filesystem_size_bytes{instance=\"$instance\", job=~\"station-node-exporter\", mountpoint=\"/\"})) * 100",
+          "legendFormat": ""
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "steps": [
+            { "color": "green", "value": null },
+            { "color": "orange", "value": 60 },
+            { "color": "red", "value": 70 }
+          ]},
+          "unit": "celsius"
+        }
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 1 },
+      "id": 5,
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "title": "NVMe Temp",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "station_smart_temperature_celsius{instance=\"$instance\"}",
+          "legendFormat": "{{ device }}"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "steps": [
+            { "color": "green", "value": null },
+            { "color": "yellow", "value": 70 },
+            { "color": "red", "value": 90 }
+          ]},
+          "unit": "celsius"
+        }
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 1 },
+      "id": 6,
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "title": "CPU Temp",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "node_hwmon_temp_celsius{instance=\"$instance\", job=~\"station-node-exporter\", chip=~\".*0000:00:18.*\", sensor=\"temp1\"}",
+          "legendFormat": "Tctl"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
+      "id": 101,
+      "title": "Thermal Monitoring",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "fillOpacity": 10, "lineWidth": 2, "spanNulls": false },
+          "unit": "celsius",
+          "thresholds": { "steps": [
+            { "color": "green", "value": null },
+            { "color": "yellow", "value": 80 },
+            { "color": "red", "value": 95 }
+          ]}
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+      "id": 10,
+      "options": { "tooltip": { "mode": "multi" } },
+      "title": "All Temperatures",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "node_hwmon_temp_celsius{instance=\"$instance\", job=~\"station-node-exporter\"}",
+          "legendFormat": "{{ chip }} / {{ sensor }}"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "fillOpacity": 10, "lineWidth": 2 },
+          "unit": "celsius"
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+      "id": 11,
+      "title": "CPU Temperature (k10temp)",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "node_hwmon_temp_celsius{instance=\"$instance\", job=~\"station-node-exporter\", chip=~\".*0000:00:18.*\"}",
+          "legendFormat": "{{ sensor }}"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 14 },
+      "id": 102,
+      "title": "NVMe / SMART Health",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "steps": [
+            { "color": "green", "value": null },
+            { "color": "yellow", "value": 0.8 },
+            { "color": "red", "value": 0.95 }
+          ]},
+          "unit": "percentunit", "min": 0, "max": 1
+        }
+      },
+      "gridPos": { "h": 5, "w": 4, "x": 0, "y": 15 },
+      "id": 20,
+      "options": { "orientation": "horizontal", "showThresholdLabels": false, "showThresholdMarkers": true },
+      "title": "Drive Wear",
+      "type": "gauge",
+      "targets": [
+        {
+          "expr": "station_smart_percentage_used_ratio{instance=\"$instance\"}",
+          "legendFormat": "{{ device }}"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "steps": [
+            { "color": "red", "value": null },
+            { "color": "yellow", "value": 0.1 },
+            { "color": "green", "value": 0.5 }
+          ]},
+          "unit": "percentunit", "min": 0, "max": 1
+        }
+      },
+      "gridPos": { "h": 5, "w": 4, "x": 4, "y": 15 },
+      "id": 21,
+      "options": { "orientation": "horizontal", "showThresholdLabels": false, "showThresholdMarkers": true },
+      "title": "Available Spare",
+      "type": "gauge",
+      "targets": [
+        {
+          "expr": "station_smart_available_spare_ratio{instance=\"$instance\"}",
+          "legendFormat": "{{ device }}"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "steps": [
+            { "color": "green", "value": null },
+            { "color": "red", "value": 1 }
+          ]}
+        }
+      },
+      "gridPos": { "h": 5, "w": 3, "x": 8, "y": 15 },
+      "id": 22,
+      "options": { "colorMode": "background", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "title": "Critical Warning",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "station_smart_critical_warning{instance=\"$instance\"}",
+          "legendFormat": "{{ device }}"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "steps": [
+            { "color": "green", "value": null },
+            { "color": "red", "value": 1 }
+          ]}
+        }
+      },
+      "gridPos": { "h": 5, "w": 3, "x": 11, "y": 15 },
+      "id": 23,
+      "options": { "colorMode": "background", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "title": "Media Errors",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "station_smart_media_errors_total{instance=\"$instance\"}",
+          "legendFormat": "{{ device }}"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": { "unit": "h" }
+      },
+      "gridPos": { "h": 5, "w": 3, "x": 14, "y": 15 },
+      "id": 24,
+      "options": { "colorMode": "value", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "title": "Power-On Hours",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "station_smart_power_on_hours_total{instance=\"$instance\"}",
+          "legendFormat": "{{ device }}"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": { "unit": "decbytes" }
+      },
+      "gridPos": { "h": 5, "w": 3, "x": 17, "y": 15 },
+      "id": 25,
+      "options": { "colorMode": "value", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "title": "Data Written",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "station_smart_data_written_bytes_total{instance=\"$instance\"}",
+          "legendFormat": "{{ device }}"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": {} },
+      "gridPos": { "h": 5, "w": 4, "x": 20, "y": 15 },
+      "id": 26,
+      "options": { "colorMode": "value", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "title": "Unsafe Shutdowns",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "station_smart_unsafe_shutdowns_total{instance=\"$instance\"}",
+          "legendFormat": "{{ device }}"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "fillOpacity": 10, "lineWidth": 2 },
+          "unit": "celsius"
+        }
+      },
+      "gridPos": { "h": 7, "w": 12, "x": 0, "y": 20 },
+      "id": 27,
+      "title": "NVMe Temperature Over Time",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "station_smart_temperature_celsius{instance=\"$instance\"}",
+          "legendFormat": "{{ device }} ({{ model }})"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "fillOpacity": 10, "lineWidth": 2 },
+          "unit": "Bps"
+        }
+      },
+      "gridPos": { "h": 7, "w": 12, "x": 12, "y": 20 },
+      "id": 28,
+      "title": "Disk I/O",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "rate(node_disk_read_bytes_total{instance=\"$instance\", job=~\"station-node-exporter\", device=~\"nvme.*|sd.*\"}[5m])",
+          "legendFormat": "{{ device }} read"
+        },
+        {
+          "expr": "rate(node_disk_written_bytes_total{instance=\"$instance\", job=~\"station-node-exporter\", device=~\"nvme.*|sd.*\"}[5m])",
+          "legendFormat": "{{ device }} write"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 27 },
+      "id": 103,
+      "title": "GPU",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "steps": [{ "color": "blue", "value": null }] },
+          "mappings": [
+            { "options": { "0": { "text": "Not Detected" } }, "type": "value" },
+            { "options": { "1": { "text": "Detected" } }, "type": "value" }
+          ]
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 28 },
+      "id": 30,
+      "options": { "colorMode": "background", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "title": "GPU Status",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "station_gpu_detected{instance=\"$instance\"} or vector(0)",
+          "legendFormat": "{{ vendor }} {{ model }} ({{ driver }})"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "thresholds": { "steps": [
+            { "color": "green", "value": null },
+            { "color": "yellow", "value": 75 },
+            { "color": "red", "value": 90 }
+          ]}
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 28 },
+      "id": 31,
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "title": "GPU Temperature",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "station_gpu_temperature_celsius{instance=\"$instance\"}",
+          "legendFormat": "{{ device }}"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "thresholds": { "steps": [
+            { "color": "green", "value": null },
+            { "color": "yellow", "value": 0.7 },
+            { "color": "red", "value": 0.9 }
+          ]},
+          "min": 0, "max": 1
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 28 },
+      "id": 32,
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "title": "GPU Utilization",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "station_gpu_utilization_ratio{instance=\"$instance\"}",
+          "legendFormat": "{{ device }}"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "unit": "bytes" } },
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 28 },
+      "id": 33,
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "title": "GPU Memory Used",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "station_gpu_memory_used_bytes{instance=\"$instance\"}",
+          "legendFormat": "{{ device }}"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 32 },
+      "id": 104,
+      "title": "CPU & Memory",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "fillOpacity": 30, "lineWidth": 1, "stacking": { "mode": "normal" } },
+          "unit": "percentunit", "min": 0, "max": 1
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 33 },
+      "id": 40,
+      "title": "CPU Usage by Mode",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "avg by (mode) (rate(node_cpu_seconds_total{instance=\"$instance\", job=~\"station-node-exporter\", mode!=\"idle\"}[5m]))",
+          "legendFormat": "{{ mode }}"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "fillOpacity": 30, "lineWidth": 1, "stacking": { "mode": "normal" } },
+          "unit": "bytes"
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 33 },
+      "id": 41,
+      "title": "Memory Usage",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "node_memory_MemTotal_bytes{instance=\"$instance\", job=~\"station-node-exporter\"} - node_memory_MemAvailable_bytes{instance=\"$instance\", job=~\"station-node-exporter\"}",
+          "legendFormat": "Used"
+        },
+        {
+          "expr": "node_memory_Cached_bytes{instance=\"$instance\", job=~\"station-node-exporter\"}",
+          "legendFormat": "Cached"
+        },
+        {
+          "expr": "node_memory_Buffers_bytes{instance=\"$instance\", job=~\"station-node-exporter\"}",
+          "legendFormat": "Buffers"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 41 },
+      "id": 105,
+      "title": "Network",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "fillOpacity": 10, "lineWidth": 2 },
+          "unit": "bps"
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 42 },
+      "id": 50,
+      "title": "Network Traffic",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "rate(node_network_receive_bytes_total{instance=\"$instance\", job=~\"station-node-exporter\", device!~\"lo|docker.*|veth.*|br-.*\"}[5m]) * 8",
+          "legendFormat": "{{ device }} RX"
+        },
+        {
+          "expr": "rate(node_network_transmit_bytes_total{instance=\"$instance\", job=~\"station-node-exporter\", device!~\"lo|docker.*|veth.*|br-.*\"}[5m]) * 8",
+          "legendFormat": "{{ device }} TX"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "fillOpacity": 10, "lineWidth": 2 }
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 42 },
+      "id": 51,
+      "title": "Network Errors & Drops",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "rate(node_network_receive_errs_total{instance=\"$instance\", job=~\"station-node-exporter\", device!~\"lo|docker.*|veth.*\"}[5m])",
+          "legendFormat": "{{ device }} RX errors"
+        },
+        {
+          "expr": "rate(node_network_transmit_errs_total{instance=\"$instance\", job=~\"station-node-exporter\", device!~\"lo|docker.*|veth.*\"}[5m])",
+          "legendFormat": "{{ device }} TX errors"
+        },
+        {
+          "expr": "rate(node_network_receive_drop_total{instance=\"$instance\", job=~\"station-node-exporter\", device!~\"lo|docker.*|veth.*\"}[5m])",
+          "legendFormat": "{{ device }} RX drops"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 50 },
+      "id": 106,
+      "title": "System Events",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "fillOpacity": 10, "lineWidth": 2 }
+        }
+      },
+      "gridPos": { "h": 7, "w": 8, "x": 0, "y": 51 },
+      "id": 60,
+      "title": "Load Average",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "node_load1{instance=\"$instance\", job=~\"station-node-exporter\"}",
+          "legendFormat": "1m"
+        },
+        {
+          "expr": "node_load5{instance=\"$instance\", job=~\"station-node-exporter\"}",
+          "legendFormat": "5m"
+        },
+        {
+          "expr": "node_load15{instance=\"$instance\", job=~\"station-node-exporter\"}",
+          "legendFormat": "15m"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "steps": [
+            { "color": "green", "value": null },
+            { "color": "yellow", "value": 70 },
+            { "color": "red", "value": 90 }
+          ]},
+          "unit": "percent",
+          "custom": { "displayMode": "gradient-gauge" }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 7, "w": 8, "x": 8, "y": 51 },
+      "id": 61,
+      "title": "Filesystem Usage",
+      "type": "bargauge",
+      "options": { "displayMode": "gradient", "orientation": "horizontal", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [
+        {
+          "expr": "(1 - (node_filesystem_avail_bytes{instance=\"$instance\", job=~\"station-node-exporter\", fstype=~\"ext4|xfs|btrfs|zfs\"} / node_filesystem_size_bytes{instance=\"$instance\", job=~\"station-node-exporter\", fstype=~\"ext4|xfs|btrfs|zfs\"})) * 100",
+          "legendFormat": "{{ mountpoint }}"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "fillOpacity": 10, "lineWidth": 2 },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 7, "w": 8, "x": 16, "y": 51 },
+      "id": 62,
+      "title": "Context Switches & Interrupts",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "rate(node_context_switches_total{instance=\"$instance\", job=~\"station-node-exporter\"}[5m])",
+          "legendFormat": "context switches/s"
+        },
+        {
+          "expr": "rate(node_intr_total{instance=\"$instance\", job=~\"station-node-exporter\"}[5m])",
+          "legendFormat": "interrupts/s"
+        }
+      ]
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "tags": ["station-monitor", "hardware", "smart"],
+  "templating": {
+    "list": [
+      {
+        "current": { "selected": false, "text": "Prometheus", "value": "Prometheus" },
+        "hide": 0,
+        "includeAll": false,
+        "name": "datasource",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "type": "datasource"
+      },
+      {
+        "current": {},
+        "datasource": { "type": "prometheus", "uid": "${datasource}" },
+        "definition": "label_values(up{job=~\"station-monitor|station-node-exporter\"}, instance)",
+        "hide": 0,
+        "includeAll": false,
+        "name": "instance",
+        "query": { "query": "label_values(up{job=~\"station-monitor|station-node-exporter\"}, instance)", "refId": "StandardVariableQuery" },
+        "refresh": 2,
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": { "from": "now-6h", "to": "now" },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Station Monitor",
+  "uid": "station-monitor",
+  "version": 1
+}

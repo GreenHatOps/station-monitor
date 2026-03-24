@@ -1,0 +1,19 @@
+{
+  "json_format_version": [1, 0],
+  "smartctl": { "exit_status": 0 },
+  "model_name": "Old NVMe Drive",
+  "temperature": { "current": 55 },
+  "power_on_time": { "hours": 30000 },
+  "power_cycle_count": 500,
+  "nvme_smart_health_information_log": {
+    "critical_warning": 0,
+    "available_spare": 5,
+    "available_spare_threshold": 10,
+    "percentage_used": 95,
+    "data_units_read": 999999999,
+    "data_units_written": 888888888,
+    "power_cycles": 500,
+    "unsafe_shutdowns": 20,
+    "media_errors": 3
+  }
+}

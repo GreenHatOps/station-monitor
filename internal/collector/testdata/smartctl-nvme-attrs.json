@@ -1,0 +1,20 @@
+{
+  "json_format_version": [1, 0],
+  "smartctl": { "exit_status": 0 },
+  "model_name": "Samsung SSD 990 EVO Plus 2TB",
+  "temperature": { "current": 29 },
+  "power_on_time": { "hours": 42 },
+  "power_cycle_count": 12,
+  "nvme_smart_health_information_log": {
+    "critical_warning": 0,
+    "temperature": 29,
+    "available_spare": 100,
+    "available_spare_threshold": 10,
+    "percentage_used": 0,
+    "data_units_read": 30936,
+    "data_units_written": 84508,
+    "power_cycles": 12,
+    "unsafe_shutdowns": 3,
+    "media_errors": 0
+  }
+}

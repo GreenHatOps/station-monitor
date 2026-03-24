@@ -1,0 +1,29 @@
+services:
+  node-exporter:
+    image: prom/node-exporter:v1.9.0
+    container_name: node-exporter
+    restart: unless-stopped
+    network_mode: host
+    pid: host
+    command:
+      - '--path.rootfs=/host'
+      - '--web.listen-address=:9100'
+    volumes:
+      - /:/host:ro,rslave
+
+  station-monitor:
+    build: .
+    image: ghcr.io/greenhatops/station-monitor:latest
+    container_name: station-monitor
+    restart: unless-stopped
+    network_mode: host
+    privileged: true
+    volumes:
+      - /sys:/host/sys:ro
+      - /proc:/host/proc:ro
+      - /etc/os-release:/host/etc/os-release:ro
+      - /dev:/dev
+    environment:
+      - LISTEN_ADDR=0.0.0.0
+      - LISTEN_PORT=9101
+      - SMART_INTERVAL=5m
