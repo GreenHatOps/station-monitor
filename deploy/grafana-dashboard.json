@@ -227,6 +227,109 @@
     {
       "collapsed": false,
       "gridPos": { "h": 1, "w": 24, "x": 0, "y": 14 },
+      "id": 107,
+      "title": "Fan Monitoring",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "steps": [
+            { "color": "red", "value": null },
+            { "color": "yellow", "value": 200 },
+            { "color": "green", "value": 400 }
+          ]},
+          "unit": "rotrpm"
+        }
+      },
+      "gridPos": { "h": 5, "w": 4, "x": 0, "y": 15 },
+      "id": 70,
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "title": "Fan 2",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "node_hwmon_fan_rpm{instance=\"$instance\", job=~\"station-node-exporter\", sensor=\"fan2\"}",
+          "legendFormat": ""
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "steps": [
+            { "color": "red", "value": null },
+            { "color": "yellow", "value": 200 },
+            { "color": "green", "value": 400 }
+          ]},
+          "unit": "rotrpm"
+        }
+      },
+      "gridPos": { "h": 5, "w": 4, "x": 4, "y": 15 },
+      "id": 71,
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "title": "Fan 3",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "node_hwmon_fan_rpm{instance=\"$instance\", job=~\"station-node-exporter\", sensor=\"fan3\"}",
+          "legendFormat": ""
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "steps": [
+            { "color": "red", "value": null },
+            { "color": "yellow", "value": 200 },
+            { "color": "green", "value": 400 }
+          ]},
+          "unit": "rotrpm"
+        }
+      },
+      "gridPos": { "h": 5, "w": 4, "x": 8, "y": 15 },
+      "id": 72,
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "title": "Fan 4",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "node_hwmon_fan_rpm{instance=\"$instance\", job=~\"station-node-exporter\", sensor=\"fan4\"}",
+          "legendFormat": ""
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "fillOpacity": 10, "lineWidth": 2 },
+          "unit": "rotrpm"
+        }
+      },
+      "gridPos": { "h": 5, "w": 12, "x": 12, "y": 15 },
+      "id": 73,
+      "title": "Fan Speed Over Time",
+      "type": "timeseries",
+      "options": { "tooltip": { "mode": "multi" } },
+      "targets": [
+        {
+          "expr": "node_hwmon_fan_rpm{instance=\"$instance\", job=~\"station-node-exporter\"}",
+          "legendFormat": "{{ sensor }}"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 20 },
       "id": 102,
       "title": "NVMe / SMART Health",
       "type": "row"
