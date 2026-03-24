@@ -347,7 +347,7 @@
           "unit": "percentunit", "min": 0, "max": 1
         }
       },
-      "gridPos": { "h": 5, "w": 4, "x": 0, "y": 15 },
+      "gridPos": { "h": 5, "w": 4, "x": 0, "y": 21 },
       "id": 20,
       "options": { "orientation": "horizontal", "showThresholdLabels": false, "showThresholdMarkers": true },
       "title": "Drive Wear",
@@ -372,7 +372,7 @@
           "unit": "percentunit", "min": 0, "max": 1
         }
       },
-      "gridPos": { "h": 5, "w": 4, "x": 4, "y": 15 },
+      "gridPos": { "h": 5, "w": 4, "x": 4, "y": 21 },
       "id": 21,
       "options": { "orientation": "horizontal", "showThresholdLabels": false, "showThresholdMarkers": true },
       "title": "Available Spare",
@@ -395,7 +395,7 @@
           ]}
         }
       },
-      "gridPos": { "h": 5, "w": 3, "x": 8, "y": 15 },
+      "gridPos": { "h": 5, "w": 3, "x": 8, "y": 21 },
       "id": 22,
       "options": { "colorMode": "background", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
       "title": "Critical Warning",
@@ -418,7 +418,7 @@
           ]}
         }
       },
-      "gridPos": { "h": 5, "w": 3, "x": 11, "y": 15 },
+      "gridPos": { "h": 5, "w": 3, "x": 11, "y": 21 },
       "id": 23,
       "options": { "colorMode": "background", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
       "title": "Media Errors",
@@ -435,7 +435,7 @@
       "fieldConfig": {
         "defaults": { "unit": "h" }
       },
-      "gridPos": { "h": 5, "w": 3, "x": 14, "y": 15 },
+      "gridPos": { "h": 5, "w": 2, "x": 14, "y": 21 },
       "id": 24,
       "options": { "colorMode": "value", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
       "title": "Power-On Hours",
@@ -452,7 +452,7 @@
       "fieldConfig": {
         "defaults": { "unit": "decbytes" }
       },
-      "gridPos": { "h": 5, "w": 3, "x": 17, "y": 15 },
+      "gridPos": { "h": 5, "w": 4, "x": 16, "y": 21 },
       "id": 25,
       "options": { "colorMode": "value", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
       "title": "Data Written",
@@ -467,7 +467,7 @@
     {
       "datasource": { "type": "prometheus", "uid": "${datasource}" },
       "fieldConfig": { "defaults": {} },
-      "gridPos": { "h": 5, "w": 4, "x": 20, "y": 15 },
+      "gridPos": { "h": 5, "w": 4, "x": 20, "y": 21 },
       "id": 26,
       "options": { "colorMode": "value", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
       "title": "Unsafe Shutdowns",
@@ -488,7 +488,7 @@
           "unit": "celsius"
         }
       },
-      "gridPos": { "h": 7, "w": 12, "x": 0, "y": 20 },
+      "gridPos": { "h": 7, "w": 12, "x": 0, "y": 26 },
       "id": 27,
       "title": "NVMe Temperature Over Time",
       "type": "timeseries",
@@ -508,7 +508,7 @@
           "unit": "Bps"
         }
       },
-      "gridPos": { "h": 7, "w": 12, "x": 12, "y": 20 },
+      "gridPos": { "h": 7, "w": 12, "x": 12, "y": 26 },
       "id": 28,
       "title": "Disk I/O",
       "type": "timeseries",
