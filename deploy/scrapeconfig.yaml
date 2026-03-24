@@ -11,10 +11,10 @@ spec:
   scrapeInterval: 30s
   staticConfigs:
     - targets:
-        - "192.168.1.90:9100"
+        - "<STATION_IP>:9100"
       labels:
         job: station-node-exporter
-        instance: g-console
+        instance: <HOSTNAME>
 ---
 apiVersion: monitoring.coreos.com/v1alpha1
 kind: ScrapeConfig
@@ -28,7 +28,7 @@ spec:
   scrapeInterval: 30s
   staticConfigs:
     - targets:
-        - "192.168.1.90:9101"
+        - "<STATION_IP>:9101"
       labels:
         job: station-monitor
-        instance: g-console
+        instance: <HOSTNAME>

@@ -85,16 +85,18 @@ station_gpu_memory_used_bytes{...}
 ```bash
 $ curl -s localhost:9101/inventory | jq .
 {
-  "hostname": "g-console",
-  "os": "Pop!_OS 24.04 LTS",
-  "kernel": "6.18.7-76061807-generic",
-  "cpu": {"model": "AMD Ryzen 9 8945HX", "cores": 16, "threads": 32},
-  "memory_bytes": 98813427712,
+  "hostname": "my-workstation",
+  "os": "Ubuntu 24.04 LTS",
+  "kernel": "6.8.0-generic",
+  "arch": "amd64",
+  "cpu": {"model": "AMD Ryzen 9 7950X", "cores": 16, "threads": 32},
+  "memory_bytes": 68719476736,
   "drives": [
-    {"device": "/dev/nvme0", "model": "Samsung SSD 990 EVO Plus 2TB", "type": "nvme"}
+    {"device": "/dev/nvme0", "model": "Samsung 990 Pro 2TB", "type": "nvme"},
+    {"device": "/dev/sda", "model": "WDC WD40EZRZ", "type": "sat"}
   ],
   "gpu": [
-    {"vendor": "amd", "model": "AMD GPU", "type": "igpu", "driver_loaded": false}
+    {"vendor": "nvidia", "model": "NVIDIA GeForce RTX 4090", "type": "dgpu", "driver_loaded": true}
   ],
   "station_monitor_version": "0.1.0"
 }

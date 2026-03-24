@@ -13,3 +13,7 @@ Thumbs.db
 
 # Test
 coverage.out
+
+# Local / personal
+CLAUDE.md
+HARDWARE.md
