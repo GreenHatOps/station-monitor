@@ -54,6 +54,15 @@ spec:
             summary: "Drive {{ $labels.device }} temperature is {{ $value }}°C"
             description: "Drive {{ $labels.device }} ({{ $labels.model }}) temperature exceeds 70°C threshold."
 
+        - alert: StationTargetDown
+          expr: up{job=~"station-monitor|station-node-exporter"} == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Station target {{ $labels.job }} is down"
+            description: "Prometheus cannot scrape {{ $labels.job }} on {{ $labels.instance }} for 5 minutes."
+
         - alert: SmartReallocatedSectors
           expr: station_smart_reallocated_sectors_total > 0
           for: 0m
