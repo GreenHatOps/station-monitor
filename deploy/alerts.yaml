@@ -63,6 +63,15 @@ spec:
             summary: "Station target {{ $labels.job }} is down"
             description: "Prometheus cannot scrape {{ $labels.job }} on {{ $labels.instance }} for 5 minutes."
 
+        - alert: StationTargetAbsent
+          expr: absent(up{job="station-monitor"}) or absent(up{job="station-node-exporter"})
+          for: 10m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Station scrape target has disappeared"
+            description: "No 'up' series for a station job — the ScrapeConfig may have been deleted."
+
         - alert: SmartReallocatedSectors
           expr: station_smart_reallocated_sectors_total > 0
           for: 0m
