@@ -136,6 +136,65 @@ func TestGPUCollector_NvidiaMalformedOutput(t *testing.T) {
 	}
 }
 
+func TestGPUCollector_MultiNvidia(t *testing.T) {
+	runner := &MockRunner{Responses: map[string]MockResponse{
+		"nvidia-smi --query-gpu=temperature.gpu,utilization.gpu,memory.used --format=csv,noheader,nounits": {
+			Output: []byte("65, 87, 18432\n52, 10, 2048\n"),
+		},
+	}}
+
+	gc := NewGPUCollector(runner)
+	gc.mu.Lock()
+	gc.gpus = []GPUInfo{
+		{Vendor: "nvidia", Model: "NVIDIA GeForce RTX 4090", Type: "dgpu", DriverReady: true},
+		{Vendor: "nvidia", Model: "NVIDIA GeForce RTX 4090", Type: "dgpu", DriverReady: true},
+	}
+	gc.mu.Unlock()
+
+	gc.collectMetrics()
+	families := collectMetrics(t, gc)
+
+	f := findMetric(families, "station_gpu_temperature_celsius")
+	if f == nil || len(f.GetMetric()) != 2 {
+		t.Fatalf("expected 2 temperature metrics, got %v", f)
+	}
+	temps := map[string]float64{}
+	for _, m := range f.GetMetric() {
+		temps[getLabelValue(m, "device")] = m.Gauge.GetValue()
+	}
+	if temps["gpu0"] != 65 || temps["gpu1"] != 52 {
+		t.Errorf("temps = %v, want gpu0=65 gpu1=52", temps)
+	}
+}
+
+func TestGPUCollector_MultiNvidia_OneLineMalformed(t *testing.T) {
+	runner := &MockRunner{Responses: map[string]MockResponse{
+		"nvidia-smi --query-gpu=temperature.gpu,utilization.gpu,memory.used --format=csv,noheader,nounits": {
+			Output: []byte("garbage\n52, 10, 2048\n"),
+		},
+	}}
+
+	gc := NewGPUCollector(runner)
+	gc.mu.Lock()
+	gc.gpus = []GPUInfo{
+		{Vendor: "nvidia", Model: "A", Type: "dgpu", DriverReady: true},
+		{Vendor: "nvidia", Model: "B", Type: "dgpu", DriverReady: true},
+	}
+	gc.mu.Unlock()
+
+	gc.collectMetrics()
+	families := collectMetrics(t, gc)
+
+	f := findMetric(families, "station_gpu_temperature_celsius")
+	if f == nil || len(f.GetMetric()) != 1 {
+		t.Fatalf("expected 1 temperature metric (malformed line skipped), got %v", f)
+	}
+	m := f.GetMetric()[0]
+	if getLabelValue(m, "device") != "gpu1" || m.Gauge.GetValue() != 52 {
+		t.Errorf("got device=%s temp=%v, want gpu1/52", getLabelValue(m, "device"), m.Gauge.GetValue())
+	}
+}
+
 func TestGPUCollector_AMDiGPU(t *testing.T) {
 	runner := &MockRunner{Responses: map[string]MockResponse{}}
 	gc := NewGPUCollector(runner)

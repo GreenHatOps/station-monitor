@@ -313,6 +313,34 @@ func TestSmartSATA_Metrics(t *testing.T) {
 	if f.GetMetric()[0].Counter.GetValue() != 1 {
 		t.Errorf("pending_sectors = %v, want 1", f.GetMetric()[0].Counter.GetValue())
 	}
+
+	// Read/written bytes from attrs 241/242 (LBAs × 512)
+	for _, tt := range []struct {
+		metric string
+		want   float64
+	}{
+		{"station_smart_data_written_bytes_total", 1000000 * 512},
+		{"station_smart_data_read_bytes_total", 2000000 * 512},
+	} {
+		f := findMetric(families, tt.metric)
+		if f == nil {
+			t.Errorf("no %s metric found", tt.metric)
+			continue
+		}
+		found := false
+		for _, m := range f.GetMetric() {
+			if getLabelValue(m, "type") != "sat" {
+				continue
+			}
+			found = true
+			if m.Counter.GetValue() != tt.want {
+				t.Errorf("%s (sat) = %v, want %v", tt.metric, m.Counter.GetValue(), tt.want)
+			}
+		}
+		if !found {
+			t.Errorf("%s has no metric with type=sat", tt.metric)
+		}
+	}
 }
 
 // --- Edge Cases ---

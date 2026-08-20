@@ -11,7 +11,9 @@
       { "id": 9, "name": "Power_On_Hours", "raw": { "value": 8760 } },
       { "id": 12, "name": "Power_Cycle_Count", "raw": { "value": 200 } },
       { "id": 194, "name": "Temperature_Celsius", "raw": { "value": 35 } },
-      { "id": 197, "name": "Current_Pending_Sector", "raw": { "value": 1 } }
+      { "id": 197, "name": "Current_Pending_Sector", "raw": { "value": 1 } },
+      { "id": 241, "name": "Total_LBAs_Written", "raw": { "value": 1000000 } },
+      { "id": 242, "name": "Total_LBAs_Read", "raw": { "value": 2000000 } }
     ]
   }
 }

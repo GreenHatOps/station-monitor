@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strconv"
 	"strings"
 	"sync"
@@ -12,7 +13,12 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-const gpuCollectInterval = 15 * time.Second
+const (
+	gpuCollectInterval = 15 * time.Second
+	// Re-probe every 20 collect ticks (~5m) so drivers loaded or GPUs added
+	// after startup are picked up without a restart.
+	gpuReprobeTicks = 20
+)
 
 // GPUInfo holds detected GPU state.
 type GPUInfo struct {
@@ -28,6 +34,7 @@ type GPUCollector struct {
 
 	mu      sync.RWMutex
 	gpus    []GPUInfo
+	probed  bool
 	metrics map[int]map[string]float64 // gpu index -> metric -> value
 
 	detectedDesc *prometheus.Desc
@@ -97,12 +104,18 @@ func (c *GPUCollector) Collect(ch chan<- prometheus.Metric) {
 	}
 }
 
-// StartBackground probes for GPUs then collects metrics in a loop.
+// StartBackground probes for GPUs then collects metrics in a loop,
+// re-probing periodically to catch hardware or driver changes.
 func (c *GPUCollector) StartBackground() {
 	c.probe()
 	c.collectMetrics()
 	ticker := time.NewTicker(gpuCollectInterval)
+	ticks := 0
 	for range ticker.C {
+		ticks++
+		if ticks%gpuReprobeTicks == 0 {
+			c.probe()
+		}
 		c.collectMetrics()
 	}
 }
@@ -110,39 +123,44 @@ func (c *GPUCollector) StartBackground() {
 func (c *GPUCollector) probe() {
 	var gpus []GPUInfo
 
-	// Check NVIDIA
+	// Check NVIDIA: one entry per nvidia-smi line (multi-GPU)
 	if hasNvidiaDevice() {
-		gpu := GPUInfo{Vendor: "nvidia", Type: "dgpu"}
 		out, err := ExecWithTimeout(c.runner, 10*time.Second, "nvidia-smi",
 			"--query-gpu=name", "--format=csv,noheader,nounits")
 		if err == nil {
-			gpu.Model = strings.TrimSpace(string(out))
-			gpu.DriverReady = true
+			for _, line := range strings.Split(strings.TrimSpace(string(out)), "\n") {
+				name := strings.TrimSpace(line)
+				if name == "" {
+					continue
+				}
+				gpus = append(gpus, GPUInfo{Vendor: "nvidia", Model: name, Type: "dgpu", DriverReady: true})
+			}
 		}
-		gpus = append(gpus, gpu)
+		if len(gpus) == 0 {
+			// Device node exists but nvidia-smi failed: driver not usable
+			gpus = append(gpus, GPUInfo{Vendor: "nvidia", Type: "dgpu"})
+		}
 	}
 
-	// Check AMD via sysfs
-	amdGPUs := detectAMDGPUs()
-	for _, ag := range amdGPUs {
-		gpu := GPUInfo{Vendor: "amd", Model: ag.model, Type: ag.gpuType}
-		// Check if rocm-smi is available
-		_, err := ExecWithTimeout(c.runner, 5*time.Second, "rocm-smi", "--showid")
-		if err == nil {
-			gpu.DriverReady = true
-		}
-		gpus = append(gpus, gpu)
+	// AMD: a card under /sys/class/drm means the kernel driver is bound
+	for _, ag := range detectAMDGPUs() {
+		gpus = append(gpus, GPUInfo{Vendor: "amd", Model: ag.model, Type: ag.gpuType, DriverReady: true})
 	}
 
-	// Fallback: check sysfs vendor IDs if nothing found yet
+	// Fallback: scan the PCI bus, which also finds GPUs with no driver bound
 	if len(gpus) == 0 {
-		gpus = detectGPUViaSysfs(gpus)
+		gpus = detectGPUViaPCI(gpus)
 	}
 
 	c.mu.Lock()
+	changed := !c.probed || !reflect.DeepEqual(c.gpus, gpus)
 	c.gpus = gpus
+	c.probed = true
 	c.mu.Unlock()
 
+	if !changed {
+		return
+	}
 	if len(gpus) > 0 {
 		for _, g := range gpus {
 			log.Printf("GPU detected: %s %s (%s, driver=%v)", g.Vendor, g.Model, g.Type, g.DriverReady)
@@ -154,10 +172,17 @@ func (c *GPUCollector) probe() {
 
 func (c *GPUCollector) collectMetrics() {
 	c.mu.RLock()
-	gpus := c.gpus
+	gpus := make([]GPUInfo, len(c.gpus))
+	copy(gpus, c.gpus)
 	c.mu.RUnlock()
 
 	metrics := make(map[int]map[string]float64)
+
+	// nvidia-smi reports all NVIDIA GPUs in one call, one line per GPU,
+	// in the same order they were appended during probe.
+	var nvidiaMaps []map[string]float64
+	nvidiaQueried := false
+	nvidiaIdx := 0
 
 	for i, gpu := range gpus {
 		if !gpu.DriverReady {
@@ -165,10 +190,14 @@ func (c *GPUCollector) collectMetrics() {
 		}
 		switch gpu.Vendor {
 		case "nvidia":
-			m := c.collectNvidia()
-			if m != nil {
-				metrics[i] = m
+			if !nvidiaQueried {
+				nvidiaMaps = c.collectNvidia()
+				nvidiaQueried = true
 			}
+			if nvidiaIdx < len(nvidiaMaps) && nvidiaMaps[nvidiaIdx] != nil {
+				metrics[i] = nvidiaMaps[nvidiaIdx]
+			}
+			nvidiaIdx++
 		}
 		// AMD ROCm collection can be added when rocm-smi JSON is stable
 	}
@@ -178,7 +207,9 @@ func (c *GPUCollector) collectMetrics() {
 	c.mu.Unlock()
 }
 
-func (c *GPUCollector) collectNvidia() map[string]float64 {
+// collectNvidia returns one metric map per nvidia-smi output line;
+// malformed lines yield nil entries to keep index alignment.
+func (c *GPUCollector) collectNvidia() []map[string]float64 {
 	out, err := ExecWithTimeout(c.runner, 10*time.Second, "nvidia-smi",
 		"--query-gpu=temperature.gpu,utilization.gpu,memory.used",
 		"--format=csv,noheader,nounits")
@@ -186,22 +217,30 @@ func (c *GPUCollector) collectNvidia() map[string]float64 {
 		return nil
 	}
 
-	fields := strings.Split(strings.TrimSpace(string(out)), ", ")
-	if len(fields) < 3 {
-		return nil
+	var result []map[string]float64
+	for _, line := range strings.Split(strings.TrimSpace(string(out)), "\n") {
+		fields := strings.Split(strings.TrimSpace(line), ", ")
+		if len(fields) < 3 {
+			result = append(result, nil)
+			continue
+		}
+		m := make(map[string]float64)
+		if v, err := strconv.ParseFloat(strings.TrimSpace(fields[0]), 64); err == nil {
+			m["temperature"] = v
+		}
+		if v, err := strconv.ParseFloat(strings.TrimSpace(fields[1]), 64); err == nil {
+			m["utilization"] = v
+		}
+		if v, err := strconv.ParseFloat(strings.TrimSpace(fields[2]), 64); err == nil {
+			m["memory_used"] = v
+		}
+		if len(m) == 0 {
+			result = append(result, nil)
+			continue
+		}
+		result = append(result, m)
 	}
-
-	m := make(map[string]float64)
-	if v, err := strconv.ParseFloat(strings.TrimSpace(fields[0]), 64); err == nil {
-		m["temperature"] = v
-	}
-	if v, err := strconv.ParseFloat(strings.TrimSpace(fields[1]), 64); err == nil {
-		m["utilization"] = v
-	}
-	if v, err := strconv.ParseFloat(strings.TrimSpace(fields[2]), 64); err == nil {
-		m["memory_used"] = v
-	}
-	return m
+	return result
 }
 
 // GPUs returns detected GPUs (used by inventory).
@@ -255,16 +294,17 @@ func detectAMDGPUs() []amdGPU {
 	return gpus
 }
 
-func detectGPUViaSysfs(existing []GPUInfo) []GPUInfo {
-	cards, _ := filepath.Glob("/sys/class/drm/card[0-9]*/device/vendor")
-	for _, vendorPath := range cards {
-		data, err := os.ReadFile(vendorPath)
-		if err != nil {
-			continue
+// detectGPUViaPCI scans the PCI bus directly, so it also finds display
+// controllers that have no kernel driver bound (invisible in /sys/class/drm).
+func detectGPUViaPCI(existing []GPUInfo) []GPUInfo {
+	classes, _ := filepath.Glob("/sys/bus/pci/devices/*/class")
+	for _, classPath := range classes {
+		if !strings.HasPrefix(readSysfsString(classPath), "0x03") {
+			continue // 0x03xxxx = display controller
 		}
-		vendor := strings.TrimSpace(string(data))
+		dir := filepath.Dir(classPath)
 		var gpu GPUInfo
-		switch vendor {
+		switch readSysfsString(filepath.Join(dir, "vendor")) {
 		case "0x10de":
 			gpu = GPUInfo{Vendor: "nvidia", Type: "dgpu"}
 		case "0x1002":
@@ -272,11 +312,10 @@ func detectGPUViaSysfs(existing []GPUInfo) []GPUInfo {
 		default:
 			continue
 		}
-		dir := filepath.Dir(vendorPath)
-		gpu.Model = readSysfsString(filepath.Join(dir, "product_name"))
-		if gpu.Model == "" {
-			gpu.Model = "Unknown " + gpu.Vendor + " GPU"
+		if _, err := os.Stat(filepath.Join(dir, "driver")); err == nil {
+			gpu.DriverReady = true
 		}
+		gpu.Model = "Unknown " + gpu.Vendor + " GPU"
 		existing = append(existing, gpu)
 	}
 	return existing

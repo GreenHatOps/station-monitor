@@ -26,6 +26,8 @@ func main() {
 	if v := os.Getenv("SMART_INTERVAL"); v != "" {
 		if d, err := time.ParseDuration(v); err == nil {
 			smartInterval = d
+		} else {
+			log.Printf("invalid SMART_INTERVAL %q, using default %s", v, smartInterval)
 		}
 	}
 

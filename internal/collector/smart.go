@@ -300,6 +300,10 @@ func (c *SmartCollector) parseSATA(json string, m map[string]float64) {
 			m["power_cycles"] = raw
 		case 197: // Current_Pending_Sector
 			m["pending_sectors"] = raw
+		case 241: // Total_LBAs_Written (assumes 512-byte sectors)
+			m["data_written_bytes"] = raw * 512
+		case 242: // Total_LBAs_Read (assumes 512-byte sectors)
+			m["data_read_bytes"] = raw * 512
 		}
 		return true
 	})
