@@ -66,7 +66,7 @@
       "type": "stat",
       "targets": [
         {
-          "expr": "(1 - avg(rate(node_cpu_seconds_total{instance=\"$instance\", job=~\"station-node-exporter\", mode=\"idle\"}[5m]))) * 100",
+          "expr": "(1 - avg(rate(node_cpu_seconds_total{instance=\"$instance\", job=~\"station-node-exporter\", mode=\"idle\"}[1m]))) * 100",
           "legendFormat": ""
         }
       ]
@@ -238,8 +238,8 @@
           "color": { "mode": "thresholds" },
           "thresholds": { "steps": [
             { "color": "red", "value": null },
-            { "color": "yellow", "value": 200 },
-            { "color": "green", "value": 400 }
+            { "color": "yellow", "value": 100 },
+            { "color": "green", "value": 200 }
           ]},
           "unit": "rotrpm"
         }
@@ -263,8 +263,8 @@
           "color": { "mode": "thresholds" },
           "thresholds": { "steps": [
             { "color": "red", "value": null },
-            { "color": "yellow", "value": 200 },
-            { "color": "green", "value": 400 }
+            { "color": "yellow", "value": 100 },
+            { "color": "green", "value": 200 }
           ]},
           "unit": "rotrpm"
         }
@@ -288,8 +288,8 @@
           "color": { "mode": "thresholds" },
           "thresholds": { "steps": [
             { "color": "red", "value": null },
-            { "color": "yellow", "value": 200 },
-            { "color": "green", "value": 400 }
+            { "color": "yellow", "value": 100 },
+            { "color": "green", "value": 200 }
           ]},
           "unit": "rotrpm"
         }
@@ -437,7 +437,7 @@
       },
       "gridPos": { "h": 5, "w": 2, "x": 14, "y": 21 },
       "id": 24,
-      "options": { "colorMode": "value", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "options": { "colorMode": "none", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
       "title": "Power-On Hours",
       "type": "stat",
       "targets": [
@@ -454,7 +454,7 @@
       },
       "gridPos": { "h": 5, "w": 4, "x": 16, "y": 21 },
       "id": 25,
-      "options": { "colorMode": "value", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "options": { "colorMode": "none", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
       "title": "Data Written",
       "type": "stat",
       "targets": [
@@ -514,11 +514,11 @@
       "type": "timeseries",
       "targets": [
         {
-          "expr": "rate(node_disk_read_bytes_total{instance=\"$instance\", job=~\"station-node-exporter\", device=~\"nvme.*|sd.*\"}[5m])",
+          "expr": "rate(node_disk_read_bytes_total{instance=\"$instance\", job=~\"station-node-exporter\", device=~\"nvme.*|sd.*\"}[1m])",
           "legendFormat": "{{ device }} read"
         },
         {
-          "expr": "rate(node_disk_written_bytes_total{instance=\"$instance\", job=~\"station-node-exporter\", device=~\"nvme.*|sd.*\"}[5m])",
+          "expr": "rate(node_disk_written_bytes_total{instance=\"$instance\", job=~\"station-node-exporter\", device=~\"nvme.*|sd.*\"}[1m])",
           "legendFormat": "{{ device }} write"
         }
       ]
@@ -640,7 +640,7 @@
       "type": "timeseries",
       "targets": [
         {
-          "expr": "avg by (mode) (rate(node_cpu_seconds_total{instance=\"$instance\", job=~\"station-node-exporter\", mode!=\"idle\"}[5m]))",
+          "expr": "avg by (mode) (rate(node_cpu_seconds_total{instance=\"$instance\", job=~\"station-node-exporter\", mode!=\"idle\"}[1m]))",
           "legendFormat": "{{ mode }}"
         }
       ]
@@ -695,11 +695,11 @@
       "type": "timeseries",
       "targets": [
         {
-          "expr": "rate(node_network_receive_bytes_total{instance=\"$instance\", job=~\"station-node-exporter\", device!~\"lo|docker.*|veth.*|br-.*\"}[5m]) * 8",
+          "expr": "rate(node_network_receive_bytes_total{instance=\"$instance\", job=~\"station-node-exporter\", device!~\"lo|docker.*|veth.*|br-.*\"}[1m]) * 8",
           "legendFormat": "{{ device }} RX"
         },
         {
-          "expr": "rate(node_network_transmit_bytes_total{instance=\"$instance\", job=~\"station-node-exporter\", device!~\"lo|docker.*|veth.*|br-.*\"}[5m]) * 8",
+          "expr": "rate(node_network_transmit_bytes_total{instance=\"$instance\", job=~\"station-node-exporter\", device!~\"lo|docker.*|veth.*|br-.*\"}[1m]) * 8",
           "legendFormat": "{{ device }} TX"
         }
       ]
@@ -718,15 +718,15 @@
       "type": "timeseries",
       "targets": [
         {
-          "expr": "rate(node_network_receive_errs_total{instance=\"$instance\", job=~\"station-node-exporter\", device!~\"lo|docker.*|veth.*\"}[5m])",
+          "expr": "rate(node_network_receive_errs_total{instance=\"$instance\", job=~\"station-node-exporter\", device!~\"lo|docker.*|veth.*\"}[1m])",
           "legendFormat": "{{ device }} RX errors"
         },
         {
-          "expr": "rate(node_network_transmit_errs_total{instance=\"$instance\", job=~\"station-node-exporter\", device!~\"lo|docker.*|veth.*\"}[5m])",
+          "expr": "rate(node_network_transmit_errs_total{instance=\"$instance\", job=~\"station-node-exporter\", device!~\"lo|docker.*|veth.*\"}[1m])",
           "legendFormat": "{{ device }} TX errors"
         },
         {
-          "expr": "rate(node_network_receive_drop_total{instance=\"$instance\", job=~\"station-node-exporter\", device!~\"lo|docker.*|veth.*\"}[5m])",
+          "expr": "rate(node_network_receive_drop_total{instance=\"$instance\", job=~\"station-node-exporter\", device!~\"lo|docker.*|veth.*\"}[1m])",
           "legendFormat": "{{ device }} RX drops"
         }
       ]
@@ -807,17 +807,17 @@
       "type": "timeseries",
       "targets": [
         {
-          "expr": "rate(node_context_switches_total{instance=\"$instance\", job=~\"station-node-exporter\"}[5m])",
+          "expr": "rate(node_context_switches_total{instance=\"$instance\", job=~\"station-node-exporter\"}[1m])",
           "legendFormat": "context switches/s"
         },
         {
-          "expr": "rate(node_intr_total{instance=\"$instance\", job=~\"station-node-exporter\"}[5m])",
+          "expr": "rate(node_intr_total{instance=\"$instance\", job=~\"station-node-exporter\"}[1m])",
           "legendFormat": "interrupts/s"
         }
       ]
     }
   ],
-  "refresh": "30s",
+  "refresh": "5s",
   "schemaVersion": 39,
   "tags": ["station-monitor", "hardware", "smart"],
   "templating": {
